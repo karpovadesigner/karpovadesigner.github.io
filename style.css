@@ -493,3 +493,6 @@ body.lock { overflow: hidden; }
   .lb-close { top: 8px; right: 14px; }
   .lb-body video, .lb-body img { max-width: 96vw; max-height: 82vh; }
 }
+/* ничего не выезжает за края экрана (графика у карточек, рисунки первого экрана) */
+html, body { overflow-x: clip; }
+.why { overflow-x: clip; }
