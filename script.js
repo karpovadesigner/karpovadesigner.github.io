@@ -282,6 +282,18 @@ const heroMedia = document.querySelector('.hero-media'); // маска проя�
 let hx = innerWidth * 0.72, hy = innerHeight * 0.4, tx = hx, ty = hy, r = 0, tr = 0, inside = false, t0 = performance.now();
 hero.addEventListener('mousemove', e => { const b = hero.getBoundingClientRect(); tx = e.clientX - b.left; ty = e.clientY - b.top; inside = true; });
 hero.addEventListener('mouseleave', () => { inside = false; });
+// на телефоне пятно идёт за пальцем; после касания ещё немного держится и снова гуляет само
+let touchOff;
+function heroTouch(e) {
+  const t = e.touches[0]; if (!t) return;
+  const b = hero.getBoundingClientRect(); tx = t.clientX - b.left; ty = t.clientY - b.top; inside = true;
+  const dx = t.clientX / innerWidth - .5, dy = t.clientY / innerHeight - .5;
+  arts.forEach(a => { const d = +a.dataset.depth; a.style.translate = `${-dx * d * 1.6}px ${-dy * d * 1.6}px`; });
+  clearTimeout(touchOff);
+}
+hero.addEventListener('touchstart', heroTouch, { passive: true });
+hero.addEventListener('touchmove', heroTouch, { passive: true });
+hero.addEventListener('touchend', () => { clearTimeout(touchOff); touchOff = setTimeout(() => { inside = false; }, 1200); });
 function heroLoop(now) {
   const w = heroMedia.clientWidth, h = heroMedia.clientHeight, mob = innerWidth <= 760; // на телефоне лицо по центру
   if (!inside) {
