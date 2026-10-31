@@ -559,4 +559,20 @@ html, body { overflow-x: clip; }
 .neuro-issue { margin-top: clamp(70px, 8vw, 110px); padding-top: 40px; border-top: 1px solid var(--line); }
 .neuro-issue .case-num { font-size: 22px; }
 .neuro-issue-top { margin: 30px 0 0; }
+/* нейрофото: обложки журналов и выезжающее окно журнала */
+.mag-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 420px)); gap: clamp(28px, 4vw, 60px); margin-top: clamp(36px, 4vw, 56px); }
+.mag-card { display: block; text-align: left; background: none; border: 0; padding: 0; color: inherit; cursor: pointer; }
+.mag-cover { position: relative; display: block; aspect-ratio: 4 / 5; border-radius: 14px; overflow: hidden; background: var(--bg2);
+  box-shadow: 0 40px 80px -30px rgba(0,0,0,.9), 0 0 0 1px rgba(201,163,95,.28); transition: box-shadow .5s, transform .6s cubic-bezier(.2,.7,.2,1); }
+.mag-cover img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 1s cubic-bezier(.2,.7,.2,1); }
+.mag-card:hover .mag-cover { transform: translateY(-6px) rotate(-.6deg); box-shadow: 0 50px 90px -30px rgba(0,0,0,.95), 0 0 0 1px var(--gold); }
+.mag-card:hover .mag-cover img { transform: scale(1.03); }
+.mag-card:hover .deck-open { background: var(--gold); color: #111; border-color: var(--gold); }
+.mag-card:hover .deck-open b { color: #111; }
+.mag-card:focus-visible { outline: none; }
+@media (max-width: 700px) { .mag-grid { grid-template-columns: 1fr 1fr; gap: 16px; } .mag-card .deck-open { left: 10px; bottom: 10px; padding: 7px 12px; font-size: 11px; } .mag-card .deck-title { font-size: 22px; } }
+.neuro-panel { position: fixed; inset: 0; z-index: 80; background: var(--bg); overflow-y: auto; transform: translateY(100%); transition: transform .8s cubic-bezier(.7,0,.2,1); }
+.neuro-panel.open { transform: none; }
+.neuro-panel .project-bar b { font: 400 22px var(--serif); color: var(--ink); margin-left: 8px; }
+.np-content { padding: 30px var(--pad) 80px; }
 .neuro-cta { margin-top: 44px; text-align: center; }

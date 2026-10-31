@@ -53,7 +53,7 @@ function carousel(box, track) {
   addEventListener('pointerup', () => { if (!down) return; down = false; setTimeout(() => track.classList.remove('dragging'), 0); });
 }
 // папки без своего места в works.js тоже показываем — каруселью в конце
-const used = new Set(['Нейрофото — журнал', 'Нейрофото — ролики', 'Нейрофото — фото', ...CASES.map(c => c.folder), ...CATEGORIES.map(c => c.folder), typeof REVIEWS_FOLDER !== 'undefined' ? REVIEWS_FOLDER : '']);
+const used = new Set([...Object.keys(typeof MEDIA !== 'undefined' ? MEDIA : {}).filter(f => f.startsWith('Нейрофото')), ...CASES.map(c => c.folder), ...CATEGORIES.map(c => c.folder), typeof REVIEWS_FOLDER !== 'undefined' ? REVIEWS_FOLDER : '']);
 Object.keys(typeof MEDIA !== 'undefined' ? MEDIA : {}).forEach(f => { if (!used.has(f)) CATEGORIES.push({ folder: f, title: f, text: '' }); });
 CATEGORIES.forEach(c => c.items = folderItems(c.folder));
 
@@ -105,6 +105,39 @@ document.querySelectorAll('#neuro .neuro-block').forEach(b => {
   b.querySelector('sup').textContent = items.length;
   if (!items.length) b.remove(); else carousel(b, track);
 });
+// на странице — только обложки журналов; по клику журнал выезжает целиком
+const JOURNALS = [
+  { issue: 'oksana', name: 'OKSANA', num: 'Выпуск 01', who: 'Оксана Федорова', stories: 'Пять историй', folder: 'Нейрофото — журнал' },
+  { issue: 'tatyana', name: 'TATYANA', num: 'Выпуск 02', who: 'Татьяна', stories: 'Три истории', folder: 'Нейрофото TATYANA — журнал' }
+];
+const magGrid = document.getElementById('mag-grid'), np = document.querySelector('.neuro-panel'), npContent = np.querySelector('.np-content');
+JOURNALS.forEach((j, k) => {
+  const first = folderItems(j.folder)[0]; if (!first) return;
+  const c = document.createElement('button');
+  c.className = 'mag-card reveal'; c.style.transitionDelay = `${k * .12}s`;
+  c.setAttribute('aria-label', `Открыть журнал ${j.name}`);
+  c.innerHTML = `<span class="mag-cover"><img src="media/work/${first.work}.jpg" alt="Обложка журнала ${j.name}" loading="lazy"><span class="deck-open"><b>Открыть</b> журнал →</span></span>
+    <span class="deck-meta"><span class="case-num">${j.num}</span><span class="deck-title">${j.name}</span><span class="case-tag">${j.who} · ${j.stories}</span></span>`;
+  c.addEventListener('click', () => openJournal(j));
+  magGrid.appendChild(c);
+});
+let npBody = null;
+function openJournal(j) {
+  closeJournal(true);
+  npBody = document.querySelector(`.neuro-body[data-issue="${j.issue}"]`);
+  npContent.appendChild(npBody); npBody.hidden = false;
+  np.querySelector('.np-num').textContent = j.num; np.querySelector('.np-title').textContent = 'Журнал ' + j.name;
+  np.classList.add('open'); np.setAttribute('aria-hidden', 'false'); np.scrollTop = 0; document.body.classList.add('lock');
+  setTimeout(() => { dispatchEvent(new Event('resize')); npBody.querySelectorAll('.track').forEach(t => t.dispatchEvent(new Event('scroll'))); }, 120);
+}
+function closeJournal(quick) {
+  if (!npBody) return;
+  const body = npBody; npBody = null;
+  np.classList.remove('open'); np.setAttribute('aria-hidden', 'true'); document.body.classList.remove('lock');
+  setTimeout(() => { if (npBody !== body) { body.hidden = true; document.getElementById('neuro').appendChild(body); } }, quick ? 0 : 800);
+}
+np.querySelector('.np-close').addEventListener('click', () => closeJournal());
+addEventListener('keydown', e => { if (e.key === 'Escape' && npBody && !document.querySelector('.lightbox').classList.contains('open')) closeJournal(); });
 
 /* ---------- отзывы: скриншоты из папки «отзывы», пока их нет — красивые заглушки ---------- */
 const reviewBox = document.getElementById('review-list');
