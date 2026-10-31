@@ -53,7 +53,7 @@ function carousel(box, track) {
   addEventListener('pointerup', () => { if (!down) return; down = false; setTimeout(() => track.classList.remove('dragging'), 0); });
 }
 // папки без своего места в works.js тоже показываем — каруселью в конце
-const used = new Set([...CASES.map(c => c.folder), ...CATEGORIES.map(c => c.folder), typeof REVIEWS_FOLDER !== 'undefined' ? REVIEWS_FOLDER : '']);
+const used = new Set(['Нейрофото — журнал', 'Нейрофото — ролики', 'Нейрофото — фото', ...CASES.map(c => c.folder), ...CATEGORIES.map(c => c.folder), typeof REVIEWS_FOLDER !== 'undefined' ? REVIEWS_FOLDER : '']);
 Object.keys(typeof MEDIA !== 'undefined' ? MEDIA : {}).forEach(f => { if (!used.has(f)) CATEGORIES.push({ folder: f, title: f, text: '' }); });
 CATEGORIES.forEach(c => c.items = folderItems(c.folder));
 
@@ -96,6 +96,14 @@ CATEGORIES.filter(cat => cat.items.length).forEach(cat => {
   cat.items.forEach(it => track.appendChild(card(it, it.title ? it : null)));
   catBox.appendChild(sec);
   carousel(sec, track);
+});
+
+/* ---------- нейрофотосессия: журнал, сторис и все кадры ---------- */
+document.querySelectorAll('#neuro .neuro-block').forEach(b => {
+  const track = b.querySelector('.track'), items = folderItems(track.dataset.folder);
+  items.forEach(it => track.appendChild(card(it)));
+  b.querySelector('sup').textContent = items.length;
+  if (!items.length) b.remove(); else carousel(b, track);
 });
 
 /* ---------- отзывы: скриншоты из папки «отзывы», пока их нет — красивые заглушки ---------- */
@@ -217,54 +225,83 @@ form.addEventListener('submit', async e => {
   } finally { btn.disabled = false; btn.textContent = 'Отправить заявку'; }
 });
 
-/* ---------- презентации: экран со слайдами ---------- */
+/* ---------- презентации: обложки, по клику — окно со слайдами ---------- */
 const deckList = document.getElementById('deck-list');
-DECKS.forEach(d => {
-  const src = n => `media/img/${d.id}-${n}.jpg`;
-  const box = document.createElement('article');
-  box.className = 'case deck';
-  box.innerHTML = `
-    <div class="case-info reveal">
-      <span class="case-num">${d.client}</span>
-      <h3>${d.title}</h3>
-      <p class="case-tag">${d.tag}</p>
-      <p>${d.text}</p>
-      <ul class="case-done">${d.done.map(x => `<li>${x}</li>`).join('')}</ul>
-    </div>
-    <div class="deck-view reveal">
-      <div class="deck-screen" tabindex="0" aria-label="Слайды презентации, листайте стрелками">
-        <div class="deck-strip">${Array.from({ length: d.slides }, (_, i) => `<img src="${src(i + 1)}" alt="Слайд ${i + 1}" ${i ? 'loading="lazy"' : ''} draggable="false">`).join('')}</div>
-        <button class="deck-arrow prev" aria-label="Предыдущий слайд">←</button>
-        <button class="deck-arrow next" aria-label="Следующий слайд">→</button>
-        <span class="deck-count"><b>01</b> / ${String(d.slides).padStart(2, '0')}</span>
-      </div>
-      <div class="deck-thumbs">${Array.from({ length: d.slides }, (_, i) => `<button aria-label="Слайд ${i + 1}"><img loading="lazy" src="${src(i + 1)}" alt=""></button>`).join('')}</div>
-    </div>`;
-  deckList.appendChild(box);
+const pad2 = n => String(n).padStart(2, '0');
+const deckSrc = (d, n) => `media/img/${d.id}-${n}.jpg`;
+deckList.className = 'deck-grid';
+DECKS.forEach((d, k) => {
+  const c = document.createElement('button');
+  c.className = 'deck-card reveal';
+  c.style.transitionDelay = `${k * .12}s`;
+  c.setAttribute('aria-label', `Открыть презентацию «${d.title}»`);
+  c.innerHTML = `
+    <span class="deck-cover"><img src="${deckSrc(d, 1)}" alt="Титульный слайд «${d.title}»" loading="lazy">
+      <span class="deck-open"><b>Листать</b> ${d.slides} слайдов →</span></span>
+    <span class="deck-meta"><span class="case-num">${d.client}</span><span class="deck-title">${d.title}</span><span class="case-tag">${d.tag}</span></span>`;
+  c.addEventListener('click', () => openDeck(d));
+  deckList.appendChild(c);
+});
 
-  const screen = box.querySelector('.deck-screen'), strip = box.querySelector('.deck-strip');
-  const thumbs = [...box.querySelectorAll('.deck-thumbs button')], count = box.querySelector('.deck-count b');
+const dm = document.createElement('div');
+dm.className = 'deck-modal'; dm.setAttribute('role', 'dialog'); dm.setAttribute('aria-modal', 'true');
+document.body.appendChild(dm);
+let deckGo = null;
+function openDeck(d) {
+  dm.innerHTML = `
+    <button class="lb-close dm-close" aria-label="Закрыть">×</button>
+    <div class="dm-inner">
+      <div class="deck-view">
+        <div class="deck-screen" tabindex="0" aria-label="Слайды презентации, листайте стрелками">
+          <div class="deck-strip">${Array.from({ length: d.slides }, (_, i) => `<img src="${deckSrc(d, i + 1)}" alt="Слайд ${i + 1}" draggable="false">`).join('')}</div>
+          <button class="deck-arrow prev" aria-label="Предыдущий слайд">←</button>
+          <button class="deck-arrow next" aria-label="Следующий слайд">→</button>
+          <span class="deck-count"><b>01</b> / ${pad2(d.slides)}</span>
+        </div>
+        <div class="deck-thumbs" style="--n:${d.slides}">${Array.from({ length: d.slides }, (_, i) => `<button aria-label="Слайд ${i + 1}"><img src="${deckSrc(d, i + 1)}" alt=""></button>`).join('')}</div>
+      </div>
+      <div class="case-info dm-info">
+        <span class="case-num">${d.client}</span>
+        <h3>${d.title}</h3>
+        <p class="case-tag">${d.tag}</p>
+        <p>${d.text}</p>
+        <ul class="case-done">${d.done.map(x => `<li>${x}</li>`).join('')}</ul>
+        ${d.review ? `<blockquote class="dm-review"><span class="q">“</span>${d.review}<cite>— ${d.client}</cite></blockquote>` : ''}
+      </div>
+    </div>`;
+  const screen = dm.querySelector('.deck-screen'), strip = dm.querySelector('.deck-strip');
+  const thumbs = [...dm.querySelectorAll('.deck-thumbs button')], count = dm.querySelector('.deck-count b');
   let cur = 0;
-  const go = n => {
+  deckGo = n => {
     cur = (n + d.slides) % d.slides;
     strip.style.transform = `translateX(${-cur * 100}%)`;
     thumbs.forEach((t, i) => t.classList.toggle('on', i === cur));
-    count.textContent = String(cur + 1).padStart(2, '0');
+    count.textContent = pad2(cur + 1);
   };
-  go(0);
-  box.querySelector('.prev').addEventListener('click', e => { e.stopPropagation(); go(cur - 1); });
-  box.querySelector('.next').addEventListener('click', e => { e.stopPropagation(); go(cur + 1); });
-  thumbs.forEach((t, i) => t.addEventListener('click', () => go(i)));
-  screen.addEventListener('keydown', e => { if (e.key === 'ArrowRight') go(cur + 1); if (e.key === 'ArrowLeft') go(cur - 1); });
-  // свайп пальцем; простой клик — открыть слайд крупно
+  deckGo(0);
+  dm.querySelector('.prev').addEventListener('click', () => deckGo(cur - 1));
+  dm.querySelector('.next').addEventListener('click', () => deckGo(cur + 1));
+  thumbs.forEach((t, i) => t.addEventListener('click', () => deckGo(i)));
+  dm.querySelector('.dm-close').addEventListener('click', closeDeck);
+  dm.onclick = e => { if (e.target === dm) closeDeck(); };
+  // свайп пальцем
   let sx = null;
   screen.addEventListener('pointerdown', e => { if (!e.target.closest('.deck-arrow')) sx = e.clientX; });
   screen.addEventListener('pointerup', e => {
     if (sx === null) return; const dx = e.clientX - sx; sx = null;
-    if (Math.abs(dx) > 40) go(cur + (dx < 0 ? 1 : -1));
-    else { lbBody.innerHTML = `<img src="${src(cur + 1)}" alt="">`; lb.classList.add('open'); }
+    if (Math.abs(dx) > 40) deckGo(cur + (dx < 0 ? 1 : -1));
   });
-});
+  dm.classList.add('open'); document.body.style.overflow = 'hidden';
+  dm.dataset.cur = 0; dm._cur = () => cur;
+  setTimeout(() => screen.focus({ preventScroll: true }), 50);
+}
+function closeDeck() { dm.classList.remove('open'); document.body.style.overflow = ''; deckGo = null; setTimeout(() => { if (!deckGo) dm.innerHTML = ''; }, 400); }
+addEventListener('keydown', e => {
+  if (!deckGo) return;
+  if (e.key === 'Escape') { e.stopImmediatePropagation(); closeDeck(); }
+  if (e.key === 'ArrowRight') deckGo(dm._cur() + 1);
+  if (e.key === 'ArrowLeft') deckGo(dm._cur() - 1);
+}, true);
 
 /* ---------- появление при прокрутке ---------- */
 const revObs = new IntersectionObserver(entries => {
