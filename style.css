@@ -553,4 +553,7 @@ html, body { overflow-x: clip; }
 .neuro-mag .card { aspect-ratio: 1122 / 1402; width: clamp(240px, 24vw, 360px); }
 .neuro-stories .card { width: clamp(190px, 17vw, 260px); border-radius: 26px; box-shadow: 0 0 0 6px #1d1a17, 0 0 0 7px var(--line); margin: 8px; }
 .neuro-photos .card { aspect-ratio: 4 / 5; width: clamp(180px, 16vw, 250px); }
+.neuro-issue { margin-top: clamp(70px, 8vw, 110px); padding-top: 40px; border-top: 1px solid var(--line); }
+.neuro-issue .case-num { font-size: 22px; }
+.neuro-issue-top { margin: 30px 0 0; }
 .neuro-cta { margin-top: 44px; text-align: center; }
