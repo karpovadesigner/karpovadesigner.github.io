@@ -451,6 +451,8 @@ body.lock { overflow: hidden; }
 .lead-form .agree a { color: var(--gold); text-decoration: underline; text-underline-offset: 2px; }
 .lead-form .agree.bad { color: #d9826f; }
 .hp { position: absolute; left: -9999px; }
+.lead-links { margin-top: 10px; }
+.lead-links a { font-size: 24px; }
 .lead-send { border: 0; font-family: var(--sans); margin-top: 6px; }
 .lead-send[disabled] { opacity: .6; }
 .lead-msg { margin-top: 14px; font-size: 14px; color: #d9826f; min-height: 1em; }

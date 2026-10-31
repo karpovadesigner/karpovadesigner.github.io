@@ -184,45 +184,17 @@ addEventListener('popstate', () => {
 });
 if (location.hash.startsWith('#project-')) openProject(location.hash.slice(9), false);
 
-/* ---------- заявка: окно с формой, письмо уходит на почту через FormSubmit ---------- */
-const order = document.querySelector('.order'), form = order.querySelector('.lead-form'), msg = order.querySelector('.lead-msg');
+/* ---------- связаться: окно со ссылками на мессенджеры (формы нет — данные на сайте не собираются) ---------- */
+const order = document.querySelector('.order');
 function openOrder() {
   if (proj.classList.contains('open')) closeProject();
-  order.classList.remove('sent'); order.classList.add('open'); order.setAttribute('aria-hidden', 'false'); document.body.classList.add('lock');
-  setTimeout(() => form.querySelector('input').focus(), 300);
+  order.classList.add('open'); order.setAttribute('aria-hidden', 'false'); document.body.classList.add('lock');
 }
 function closeOrder() { order.classList.remove('open'); order.setAttribute('aria-hidden', 'true'); if (!proj.classList.contains('open')) document.body.classList.remove('lock'); }
 document.addEventListener('click', e => {
   const t = e.target.closest('.nav-cta, .open-lead, .btn-line[href="#contacts"]');
   if (t) { e.preventDefault(); openOrder(); return; }
   if (e.target === order || e.target.closest('.lead-close')) closeOrder();
-});
-order.querySelectorAll('.chips button').forEach(b => b.addEventListener('click', () => b.classList.toggle('on')));
-form.addEventListener('submit', async e => {
-  e.preventDefault(); msg.textContent = '';
-  let ok = true;
-  form.querySelectorAll('[required]').forEach(f => {
-    const bad = f.type === 'checkbox' ? !f.checked : !f.value.trim();
-    (f.type === 'checkbox' ? f.closest('label') : f).classList.toggle('bad', bad); if (bad) ok = false;
-  });
-  if (!ok) { msg.textContent = 'Заполните имя, контакт и отметьте согласие.'; return; }
-  if (!LEAD_EMAIL) { msg.textContent = 'Почта для заявок ещё не подключена.'; return; }
-  const data = Object.fromEntries(new FormData(form));
-  data['Что нужно'] = [...form.querySelectorAll('.chips .on')].map(b => b.textContent).join(', ') || '—';
-  data['Согласие'] = 'да';
-  data._subject = 'Заявка с сайта: ' + data['Имя'];
-  data._template = 'table'; data._captcha = 'false';
-  const btn = form.querySelector('.lead-send'); btn.disabled = true; btn.textContent = 'Отправляю…';
-  try {
-    const r = await fetch('https://formsubmit.co/ajax/' + LEAD_EMAIL, {
-      method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify(data)
-    });
-    const j = await r.json().catch(() => ({}));
-    if (!r.ok || j.success === 'false' || j.success === false) throw new Error(j.message || r.status);
-    order.classList.add('sent'); form.reset(); order.querySelectorAll('.chips .on').forEach(b => b.classList.remove('on'));
-  } catch (err) {
-    msg.innerHTML = 'Не получилось отправить. Напишите, пожалуйста, в Telegram <a href="https://t.me/karpova_design" target="_blank">@karpova_design</a>.';
-  } finally { btn.disabled = false; btn.textContent = 'Отправить заявку'; }
 });
 
 /* ---------- презентации: обложки, по клику — окно со слайдами ---------- */
