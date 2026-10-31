@@ -448,6 +448,7 @@ body.lock { overflow: hidden; }
 .chips button.on { background: var(--gold); border-color: var(--gold); color: #111; }
 .lead-form .agree { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; letter-spacing: 0; line-height: 1.5; }
 .lead-form .agree input { margin-top: 3px; accent-color: var(--gold); }
+.lead-form .agree a { color: var(--gold); text-decoration: underline; text-underline-offset: 2px; }
 .lead-form .agree.bad { color: #d9826f; }
 .hp { position: absolute; left: -9999px; }
 .lead-send { border: 0; font-family: var(--sans); margin-top: 6px; }

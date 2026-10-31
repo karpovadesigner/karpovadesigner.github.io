@@ -1,0 +1,22 @@
+/* страницы документов: политика и согласие — в цветах сайта, но спокойно для чтения */
+:root { --bg: #0d0c0b; --line: #2a2622; --ink: #ece5d8; --muted: #8e867a; --gold: #c9a35f;
+  --serif: 'Cormorant Garamond', Georgia, serif; --sans: 'Manrope', Arial, sans-serif; --pad: clamp(16px, 5vw, 80px); }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: #c8c0b3; font: 300 16px/1.7 var(--sans); }
+a { color: var(--gold); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.legal-top { display: flex; justify-content: space-between; align-items: center; padding: 24px var(--pad); border-bottom: 1px solid var(--line); }
+.legal-logo { font: 400 24px/1 var(--serif); color: var(--ink); }
+.legal-logo small { display: block; margin-top: 6px; font: 500 11px var(--sans); letter-spacing: .3em; color: var(--gold); }
+.legal-logo:hover, .legal-back:hover { text-decoration: none; opacity: .8; }
+.legal-back { font-size: 14px; color: var(--ink); border: 1px solid var(--line); border-radius: 30px; padding: 9px 18px; }
+.legal { max-width: 760px; margin: 0 auto; padding: 70px var(--pad) 90px; }
+.eyebrow { font-size: 12px; letter-spacing: .3em; text-transform: uppercase; color: var(--gold); }
+.legal h1 { font: 400 clamp(36px, 5vw, 60px)/1.05 var(--serif); color: var(--ink); margin: 16px 0 14px; }
+.legal h1 em { color: var(--gold); }
+.legal-date { color: var(--muted); font-size: 14px; margin-bottom: 40px; }
+.legal h2 { font: 500 26px/1.2 var(--serif); color: var(--ink); margin: 40px 0 12px; }
+.legal p, .legal li { margin-bottom: 10px; }
+.legal ul { padding-left: 22px; }
+.legal li::marker { color: var(--gold); }
+.legal-foot { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding: 30px var(--pad); border-top: 1px solid var(--line); font-size: 13px; color: var(--muted); }
